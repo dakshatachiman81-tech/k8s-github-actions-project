@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: website-config
+  namespace: dev
+
+data:
+  APP_NAME: "DevOps Production Website"
+  ENVIRONMENT: "Production"
+  COMPANY: "Dakshata Tech"
