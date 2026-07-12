@@ -9,7 +9,7 @@ env:
   IMAGE_NAME: k8s-github-actions-project
 
 jobs:
-  build-and-push:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -38,3 +38,19 @@ jobs:
       - name: Push Versioned Image
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            docker pull ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+            docker stop website || true
+            docker rm website || true
+            docker run -d \
+              --name website \
+              --restart unless-stopped \
+              -p 80:80 \
+              ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
