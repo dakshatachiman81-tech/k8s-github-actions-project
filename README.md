@@ -1,32 +1,91 @@
-# Kubernetes Website Deployment using Docker, GitHub & Docker Hub
+# 🚀 Kubernetes GitHub Actions CI/CD Project
 
-## 📌 Project Overview
-
-This project demonstrates the complete DevOps workflow of containerizing and preparing a static website for Kubernetes deployment.
-
-The application is built using **HTML** and **CSS**, version-controlled with **Git**, hosted on **GitHub**, containerized using **Docker**, published to **Docker Hub**, and is ready to be deployed on **Kubernetes**.
+A production-style DevOps project demonstrating an end-to-end CI/CD pipeline using GitHub Actions, Docker, Kubernetes, Docker Hub, and AWS EC2.
 
 ---
 
-## 🚀 Technologies Used
+# 📌 Project Overview
 
-- HTML5
-- CSS3
-- Git
-- GitHub
-- Docker
-- Docker Hub
-- Nginx
-- Kubernetes (Upcoming Deployment)
+This project automates the complete application deployment lifecycle.
+
+Whenever code is pushed to the **main** branch:
+
+- GitHub Actions automatically builds a Docker image.
+- Pushes the image to Docker Hub.
+- Connects to an AWS EC2 instance using SSH.
+- Pulls the latest Docker image.
+- Recreates the Docker container.
+- Deploys the latest version of the application automatically.
+
+The application is also deployed locally on Kubernetes with production-ready configurations including ConfigMaps, Secrets, Health Checks, Horizontal Pod Autoscaler, and NGINX Ingress.
 
 ---
 
-## 📂 Project Structure
+# 🏗 Project Architecture
 
 ```
-k8s-github-actions-project
+                  Developer
+                      │
+                  git push
+                      │
+                      ▼
+               GitHub Repository
+                      │
+                      ▼
+              GitHub Actions CI/CD
+                      │
+      ┌───────────────┼────────────────┐
+      │               │                │
+      ▼               ▼                ▼
+ Build Docker     Push Image      SSH into EC2
+    Image         Docker Hub
+                                      │
+                                      ▼
+                            Pull Latest Docker Image
+                                      │
+                                      ▼
+                            Restart Docker Container
+                                      │
+                                      ▼
+                              Live Application
+```
+
+---
+
+# ⚙ Technologies Used
+
+- AWS EC2
+- Docker
+- Docker Hub
+- Kubernetes
+- Git
+- GitHub
+- GitHub Actions
+- Linux (Ubuntu)
+- NGINX Ingress Controller
+- Metrics Server
+- Horizontal Pod Autoscaler (HPA)
+
+---
+
+# 📂 Project Structure
+
+```
+k8s-github-actions-project/
 │
-├── Website
+├── .github/
+│   └── workflows/
+│       └── ci-cd.yml
+│
+├── K8s/
+│   ├── namespace.yaml
+│   ├── Deployment.yaml
+│   ├── Service.yaml
+│   ├── configmap.yaml
+│   ├── secret.yaml
+│   └── ingress.yaml
+│
+├── Website/
 │   ├── index.html
 │   └── style.css
 │
@@ -37,184 +96,199 @@ k8s-github-actions-project
 
 ---
 
-## ⚙️ Dockerfile
+# 🚀 Features
 
-```dockerfile
-FROM nginx:latest
+- Dockerized Web Application
+- Kubernetes Deployment
+- Kubernetes Service
+- ConfigMaps
+- Secrets
+- Liveness Probe
+- Readiness Probe
+- Resource Requests & Limits
+- Horizontal Pod Autoscaler (HPA)
+- Metrics Server
+- NGINX Ingress
+- GitHub Actions CI Pipeline
+- Docker Hub Integration
+- AWS EC2 Deployment
+- Automatic Continuous Deployment
 
-COPY Website/ /usr/share/nginx/html/
+---
 
-EXPOSE 80
+# 🐳 Docker
+
+## Build Image
+
+```bash
+docker build -t k8s-github-actions-project .
+```
+
+## Run Container
+
+```bash
+docker run -d -p 80:80 k8s-github-actions-project
 ```
 
 ---
 
-## 🛠️ Build Docker Image
+# ☸ Kubernetes Deployment
+
+Create Namespace
 
 ```bash
-docker build -t k8s-github-actions-project:v1 .
+kubectl apply -f K8s/namespace.yaml
+```
+
+Deploy Application
+
+```bash
+kubectl apply -f K8s/
+```
+
+Verify Deployment
+
+```bash
+kubectl get all -n dev
 ```
 
 ---
 
-## ▶️ Run Docker Container
+# 📈 Horizontal Pod Autoscaler
+
+Check HPA
 
 ```bash
-docker run -d -p 8080:80 --name mywebsite k8s-github-actions-project:v1
+kubectl get hpa -n dev
 ```
 
-Visit:
+View Metrics
 
-```
-http://localhost:8080
+```bash
+kubectl top pods -n dev
 ```
 
 ---
 
-## 📦 Docker Hub
+# 🌐 Ingress
 
-Tag the image:
-
-```bash
-docker tag k8s-github-actions-project:v1 dakshata16/k8s-github-actions-project:v1
-```
-
-Push the image:
+Check Ingress
 
 ```bash
-docker push dakshata16/k8s-github-actions-project:v1
+kubectl get ingress -n dev
 ```
 
-Docker Hub Repository:
+Access
 
 ```
-https://hub.docker.com/r/dakshata16/k8s-github-actions-project
+http://website.local
+```
+
+or
+
+```
+http://<EC2-Public-IP>
 ```
 
 ---
 
-## 📁 Git Commands
+# ⚡ GitHub Actions Workflow
 
-```bash
-git init
-git add .
-git commit -m "Initial Commit"
-git push -u origin main
-```
+The CI/CD pipeline performs the following steps:
 
----
-
-## 🐳 Docker Commands
-
-Build Image
-
-```bash
-docker build -t k8s-github-actions-project:v1 .
-```
-
-View Images
-
-```bash
-docker images
-```
-
-Run Container
-
-```bash
-docker run -d -p 8080:80 --name mywebsite k8s-github-actions-project:v1
-```
-
-View Running Containers
-
-```bash
-docker ps
-```
-
-Stop Container
-
-```bash
-docker stop mywebsite
-```
-
-Remove Container
-
-```bash
-docker rm mywebsite
-```
+- Checkout Repository
+- Build Docker Image
+- Login to Docker Hub
+- Push Latest Image
+- Push Versioned Image
+- Connect to AWS EC2 via SSH
+- Pull Latest Docker Image
+- Stop Existing Container
+- Start New Container
+- Deploy Updated Application
 
 ---
 
-## 🔄 Project Workflow
+# ☁ AWS Deployment
 
-```
-Create Website
-        │
-        ▼
-Initialize Git Repository
-        │
-        ▼
-Push Source Code to GitHub
-        │
-        ▼
-Build Docker Image
-        │
-        ▼
-Run Docker Container
-        │
-        ▼
-Push Image to Docker Hub
-        │
-        ▼
-Deploy to Kubernetes
-```
+Application is hosted on:
+
+- Ubuntu EC2 Instance
+- Docker Engine
+- GitHub Actions Deployment
+- Docker Hub Image Repository
 
 ---
 
-## 🎯 Features
+# 📷 Screenshots
 
-- Static website built using HTML & CSS
-- Version controlled using Git
-- Source code hosted on GitHub
-- Containerized using Docker
-- Docker image stored in Docker Hub
-- Ready for Kubernetes deployment
+## Kubernetes
 
----
+- Pods Running
+- Services
+- Ingress
+- HPA
+- Metrics Server
 
-## 📚 Learning Outcomes
+## GitHub Actions
 
-Through this project, I learned:
+- Successful Workflow
+- Docker Image Build
+- Deployment Logs
 
-- Git and GitHub
-- Docker Image Creation
-- Docker Containers
-- Dockerfile
-- Docker Hub
-- Image Tagging
-- Nginx Web Server
-- Basic Kubernetes Deployment Workflow
+## AWS EC2
+
+- Running Docker Container
+- Live Website
 
 ---
 
-## 🚀 Future Enhancements
+# 📊 Project Highlights
 
-- Deploy application on AWS EC2
-- Install Minikube
-- Deploy on Kubernetes
-- Create Deployment and Service YAML files
-- Automate deployment using GitHub Actions
-- Implement CI/CD pipeline
+✔ End-to-End CI/CD Pipeline
+
+✔ Dockerized Application
+
+✔ Kubernetes Deployment
+
+✔ Auto Scaling with HPA
+
+✔ Metrics Server
+
+✔ NGINX Ingress
+
+✔ AWS EC2 Deployment
+
+✔ GitHub Actions Automation
+
+✔ Docker Hub Integration
 
 ---
 
-## 👩‍💻 Author
+# 🔮 Future Enhancements
+
+- Prometheus Monitoring
+- Grafana Dashboards
+- ELK / EFK Logging
+- Terraform Infrastructure as Code
+- Amazon EKS Deployment
+- ArgoCD GitOps
+- Helm Charts
+- SonarQube Code Quality
+- Trivy Image Scanning
+
+---
+
+# 👩‍💻 Author
 
 **Dakshata Chiman**
 
+AWS Cloud & DevOps Engineer
+
 GitHub: https://github.com/dakshatachiman81-tech
 
-Docker Hub: https://hub.docker.com/u/dakshata16
+LinkedIn: https://www.linkedin.com/in/dakshata-chiman
 
 ---
 
-## ⭐ If you found this project helpful, feel free to star the repository.
+# ⭐ If you found this project useful, don't forget to Star the repository!
